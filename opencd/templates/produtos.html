@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Produtos - Almoxarifado{% endblock %}
+{% block content %}
+<div class="painel">
+    <h2>Produtos
+        <a class="btn primario" href="{{ url_for('produto_novo') }}">+ Novo produto</a>
+    </h2>
+
+    <form class="filtro" method="get">
+        <input type="text" name="busca" placeholder="Buscar por nome, descrição ou fornecedor..." value="{{ busca }}">
+        <select name="categoria">
+            <option value="">Todas as categorias</option>
+            {% for c in categorias %}
+            <option value="{{ c.id }}" {% if categoria == c.id|string %}selected{% endif %}>{{ c.nome }}</option>
+            {% endfor %}
+        </select>
+        <button class="btn primario" type="submit">Filtrar</button>
+        {% if busca or categoria %}<a class="btn secundario" href="{{ url_for('produtos') }}">Limpar</a>{% endif %}
+    </form>
+
+    {% if produtos %}
+    <table>
+        <tr>
+            <th>Produto</th><th>Categoria</th><th>Fornecedor</th><th>Local</th>
+            <th>Estoque</th><th>Mínimo</th><th>Preço</th><th>Status</th><th>Ações</th>
+        </tr>
+        {% for p in produtos %}
+        <tr>
+            <td>{{ p.nome }}</td>
+            <td>{{ p.categoria or '-' }}</td>
+            <td>{{ p.fornecedor or '-' }}</td>
+            <td>{{ p.localizacao or '-' }}</td>
+            <td class="{% if p.quantidade == 0 %}sem-estoque{% endif %}">{{ p.quantidade }}</td>
+            <td>{{ p.quantidade_minima }}</td>
+            <td>R$ {{ "%.2f"|format(p.preco) }}</td>
+            <td>
+                {% if p.quantidade <= p.quantidade_minima %}
+                <span class="tag baixo">baixo</span>
+                {% else %}
+                <span class="tag ok">ok</span>
+                {% endif %}
+            </td>
+            <td>
+                <a class="btn pequeno secundario" href="{{ url_for('movimentacao_nova') }}?produto={{ p.id }}">Entrada/Saída</a>
+                <a class="btn pequeno secundario" href="{{ url_for('produto_editar', produto_id=p.id) }}">Editar</a>
+                <form method="post" action="{{ url_for('produto_excluir', produto_id=p.id) }}" style="display:inline"
+                      onsubmit="return confirm('Excluir o produto \"{{ p.nome }}\"? Isso apaga também o histórico dele.');">
+                    <button class="btn perigo" type="submit">Excluir</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <p class="vazio">Nenhum produto encontrado.</p>
+    {% endif %}
+</div>
+{% endblock %}

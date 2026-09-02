@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Relatórios - Almoxarifado{% endblock %}
+{% block content %}
+<div class="painel">
+    <h2>Gerar relatório</h2>
+
+    {% if not reportlab_ok or not openpyxl_ok %}
+    <div class="flash erro">
+        Bibliotecas opcionais ausentes. Para gerar todos os formatos, instale:
+        <code>sudo apt install python3-reportlab python3-openpyxl</code>
+    </div>
+    {% endif %}
+
+    <form method="get" action="{{ url_for('relatorios_gerar') }}">
+        <div class="form-grid">
+            <div>
+                <label for="tipo">Tipo de relatório *</label>
+                <select id="tipo" name="tipo" style="width:100%">
+                    <option value="estoque">Inventário de estoque (todos os produtos)</option>
+                    <option value="baixo">Estoque baixo / zerado</option>
+                    <option value="movimentacoes">Movimentações (entradas e saídas)</option>
+                </select>
+            </div>
+            <div>
+                <label for="formato">Formato *</label>
+                <select id="formato" name="formato" style="width:100%">
+                    <option value="pdf" {% if not reportlab_ok %}disabled{% endif %}>PDF</option>
+                    <option value="xlsx" {% if not openpyxl_ok %}disabled{% endif %}>Excel (.xlsx)</option>
+                    <option value="csv">CSV (planilha simples)</option>
+                </select>
+            </div>
+            <div class="movimento">
+                <label for="de">Data inicial</label>
+                <input type="date" id="de" name="de" style="width:100%">
+            </div>
+            <div class="movimento">
+                <label for="ate">Data final</label>
+                <input type="date" id="ate" name="ate" style="width:100%">
+            </div>
+            <div class="movimento">
+                <label for="produto">Produto (só para movimentações)</label>
+                <select id="produto" name="produto" style="width:100%">
+                    <option value="">Todos os produtos</option>
+                    {% for p in produtos %}
+                    <option value="{{ p.id }}">{{ p.nome }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div style="margin-top:18px; display:flex; gap:10px;">
+            <button class="btn primario" type="submit">Gerar relatório</button>
+        </div>
+    </form>
+    <p style="margin-top:12px; font-size:13px; color:#7f8c8d;">
+        PDF: título, cabeçalho destacado e linha de totais. Excel: título, filtros automáticos e
+        formato de moeda. CSV: separado por ponto e vírgula (abre direto no Excel/Calc).
+    </p>
+</div>
+
+<script>
+    var tipo = document.getElementById('tipo');
+    var campos = document.querySelectorAll('.movimento');
+    function alternar() {
+        var mostrar = tipo.value === 'movimentacoes';
+        campos.forEach(function (el) { el.style.display = mostrar ? '' : 'none'; });
+    }
+    tipo.addEventListener('change', alternar);
+    alternar();
+</script>
+{% endblock %}

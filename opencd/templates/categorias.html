@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Categorias - Almoxarifado{% endblock %}
+{% block content %}
+<div class="painel">
+    <h2>Gerenciar categorias</h2>
+    <form method="post" class="filtro">
+        <input type="text" name="nome" placeholder="Nova categoria..." required>
+        <button class="btn primario" type="submit">Adicionar</button>
+    </form>
+
+    {% if categorias %}
+    <table>
+        <tr><th>Categoria</th><th></th></tr>
+        {% for c in categorias %}
+        <tr>
+            <td>{{ c.nome }}</td>
+            <td>
+                <form method="post" action="{{ url_for('categoria_excluir', cat_id=c.id) }}" style="display:inline"
+                      onsubmit="return confirm('Excluir a categoria \"{{ c.nome }}\"? Os produtos ficarão sem categoria.');">
+                    <button class="btn perigo" type="submit">Excluir</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <p class="vazio">Nenhuma categoria cadastrada.</p>
+    {% endif %}
+</div>
+{% endblock %}

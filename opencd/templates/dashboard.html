@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Painel - Almoxarifado{% endblock %}
+{% block content %}
+<div class="cards">
+    <div class="card"><h3>Produtos cadastrados</h3><p>{{ total_produtos }}</p></div>
+    <div class="card"><h3>Itens em estoque</h3><p>{{ total_itens }}</p></div>
+    <div class="card"><h3>Valor do estoque</h3><p>R$ {{ "%.2f"|format(valor_estoque) }}</p></div>
+    <div class="card"><h3>Estoque baixo</h3><p class="{% if estoque_baixo|length > 0 %}alerta{% endif %}">{{ estoque_baixo|length }}</p></div>
+</div>
+
+<div class="painel">
+    <h2>Estoque baixo / zerado
+        <a class="btn primario" href="{{ url_for('produto_novo') }}">+ Novo produto</a>
+    </h2>
+    {% if estoque_baixo %}
+    <table>
+        <tr><th>Produto</th><th>Categoria</th><th>Estoque</th><th>Mínimo</th><th></th></tr>
+        {% for p in estoque_baixo %}
+        <tr>
+            <td>{{ p.nome }}</td>
+            <td>{{ p.categoria or '-' }}</td>
+            <td class="{% if p.quantidade == 0 %}sem-estoque{% endif %}">{{ p.quantidade }}</td>
+            <td>{{ p.quantidade_minima }}</td>
+            <td><a class="btn pequeno secundario" href="{{ url_for('movimentacao_nova') }}?produto={{ p.id }}">Dar entrada</a></td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <p class="vazio">Nenhum produto abaixo do mínimo.</p>
+    {% endif %}
+</div>
+
+<div class="painel">
+    <h2>Últimas movimentações
+        <a class="btn secundario" href="{{ url_for('movimentacao_nova') }}">+ Nova movimentação</a>
+    </h2>
+    {% if recentes %}
+    <table>
+        <tr><th>Data</th><th>Produto</th><th>Tipo</th><th>Qtd</th><th>Observação</th></tr>
+        {% for m in recentes %}
+        <tr>
+            <td>{{ m.data }}</td>
+            <td>{{ m.produto_nome }}</td>
+            <td><span class="tag {{ m.tipo }}">{{ m.tipo }}</span></td>
+            <td>{{ m.quantidade }}</td>
+            <td>{{ m.observacao or '-' }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <p class="vazio">Nenhuma movimentação registrada ainda.</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Almoxarifado{% endblock %}</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f4f6f8; color: #2c3e50; }
+        header { background: #1e3a5f; color: #fff; padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; }
+        header h1 { font-size: 20px; }
+        nav a { color: #cfe0f0; text-decoration: none; margin-left: 18px; font-size: 15px; }
+        nav a:hover, nav a.ativo { color: #fff; text-decoration: underline; }
+        main { max-width: 1100px; margin: 24px auto; padding: 0 16px; }
+        .flash { padding: 12px 16px; border-radius: 6px; margin-bottom: 16px; font-size: 14px; }
+        .flash.ok { background: #dff0d8; color: #3c763d; border: 1px solid #d6e9c6; }
+        .flash.erro { background: #f2dede; color: #a94442; border: 1px solid #ebccd1; }
+        .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+        .card { background: #fff; border-radius: 8px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,.1); }
+        .card h3 { font-size: 13px; color: #7f8c8d; text-transform: uppercase; margin-bottom: 6px; }
+        .card p { font-size: 26px; font-weight: 700; }
+        .card p.alerta { color: #c0392b; }
+        .painel { background: #fff; border-radius: 8px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,.1); margin-bottom: 24px; }
+        .painel h2 { font-size: 18px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid #eee; }
+        th { background: #f8f9fa; font-size: 12px; text-transform: uppercase; color: #7f8c8d; }
+        tr:hover td { background: #f8f9fa; }
+        .tag { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+        .tag.entrada { background: #dff0d8; color: #3c763d; }
+        .tag.saida { background: #f2dede; color: #a94442; }
+        .tag.baixo { background: #fcf3cf; color: #8a6d3b; }
+        .tag.ok { background: #dff0d8; color: #3c763d; }
+        .btn { display: inline-block; padding: 8px 14px; border: none; border-radius: 6px; font-size: 14px; cursor: pointer; text-decoration: none; }
+        .btn.primario { background: #1e3a5f; color: #fff; }
+        .btn.primario:hover { background: #16304f; }
+        .btn.secundario { background: #ecf0f1; color: #2c3e50; }
+        .btn.perigo { background: #c0392b; color: #fff; font-size: 12px; padding: 4px 10px; }
+        .btn.perigo:hover { background: #a93226; }
+        .btn.pequeno { font-size: 12px; padding: 4px 10px; margin-right: 4px; }
+        form.filtro { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+        input, select, textarea { padding: 8px 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; font-family: inherit; }
+        input:focus, select:focus, textarea:focus { outline: 2px solid #1e3a5f33; }
+        label { display: block; font-size: 13px; margin: 10px 0 4px; font-weight: 600; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; }
+        .form-grid .inteiro { grid-column: 1 / -1; }
+        footer { text-align: center; color: #95a5a6; font-size: 13px; padding: 20px; }
+        .vazio { text-align: center; color: #95a5a6; padding: 24px; }
+        .sem-estoque { color: #c0392b; font-weight: 700; }
+        @media (max-width: 700px) { .form-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Almoxarifado de Informática</h1>
+        <nav>
+            <a href="{{ url_for('dashboard') }}" class="{% if request.path == '/' %}ativo{% endif %}">Painel</a>
+            <a href="{{ url_for('produtos') }}" class="{% if request.path.startswith('/produtos') %}ativo{% endif %}">Produtos</a>
+            <a href="{{ url_for('movimentacoes') }}" class="{% if request.path.startswith('/movimentacoes') %}ativo{% endif %}">Movimentações</a>
+            <a href="{{ url_for('categorias') }}" class="{% if request.path.startswith('/categorias') %}ativo{% endif %}">Categorias</a>
+            <a href="{{ url_for('relatorios') }}" class="{% if request.path.startswith('/relatorios') %}ativo{% endif %}">Relatórios</a>
+            <button type="button" class="btn perigo" onclick="window.close()">Sair</button>
+        </nav>
+    </header>
+    <main>
+        {% with msgs = get_flashed_messages(with_categories=true) %}
+            {% for categoria, msg in msgs %}
+                <div class="flash {{ categoria }}">{{ msg }}</div>
+            {% endfor %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </main>
+    <footer>Controle de almoxarifado &mdash; dados salvos em almoxarifado.db</footer>
+</body>
+</html>

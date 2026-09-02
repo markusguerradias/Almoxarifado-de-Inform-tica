@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Movimentações - Almoxarifado{% endblock %}
+{% block content %}
+<div class="painel">
+    <h2>Histórico de movimentações
+        <a class="btn primario" href="{{ url_for('movimentacao_nova') }}">+ Nova movimentação</a>
+    </h2>
+
+    <form class="filtro" method="get">
+        <select name="produto">
+            <option value="">Todos os produtos</option>
+            {% for p in produtos %}
+            <option value="{{ p.id }}" {% if produto_id == p.id|string %}selected{% endif %}>{{ p.nome }}</option>
+            {% endfor %}
+        </select>
+        <button class="btn primario" type="submit">Filtrar</button>
+        {% if produto_id %}<a class="btn secundario" href="{{ url_for('movimentacoes') }}">Limpar</a>{% endif %}
+    </form>
+
+    {% if movimentacoes %}
+    <table>
+        <tr><th>Data</th><th>Produto</th><th>Tipo</th><th>Quantidade</th><th>Observação</th><th></th></tr>
+        {% for m in movimentacoes %}
+        <tr>
+            <td>{{ m.data }}</td>
+            <td>{{ m.produto_nome }}</td>
+            <td><span class="tag {{ m.tipo }}">{{ m.tipo }}</span></td>
+            <td>{{ m.quantidade }}</td>
+            <td>{{ m.observacao or '-' }}</td>
+            <td>
+                <form method="post" action="{{ url_for('movimentacao_excluir', mov_id=m.id) }}" style="display:inline"
+                      onsubmit="return confirm('Excluir este registro? O estoque não será ajustado automaticamente.');">
+                    <button class="btn perigo" type="submit">Excluir</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <p class="vazio">Nenhuma movimentação registrada.</p>
+    {% endif %}
+</div>
+{% endblock %}
